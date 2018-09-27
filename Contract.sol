@@ -14,10 +14,13 @@ contract ZombieFactory {
 
     Zombie[] public zombies;
 
-    // 여기서 매핑 선언
+    mapping (uint => address) public zombieToOwner;
+    mapping (address => uint) ownerZombieCount;
 
-    function _createZombie(string _name,auint _dna) private {
+    function _createZombie(string _name, uint _dna) private {
         uint id = zombies.push(Zombie(_name, _dna)) - 1;
+        zombieToOwner[id] = msg.sender;
+        ownerZombieCount[msg.sender]++;
         NewZombie(id, _name, _dna);
     }
 
@@ -25,9 +28,10 @@ contract ZombieFactory {
         uint rand = uint(keccak256(_str));
         return rand % dnaModulus;
     }
-+++++++++++++++++++
-+
+
     function createRandomZombie(string _name) public {
+        // 여기서 시작
+        require(ownerZombieCount[msg.sender] == 0);
         uint randDna = _generateRandomDna(_name);
         _createZombie(_name, randDna);
     }
